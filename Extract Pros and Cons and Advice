@@ -1,0 +1,43 @@
+# this script captures only pros and cons correctly
+
+import re
+
+
+
+# read the input text from a file
+with open('C:/Users/micha/OneDrive/OneDrive Documents/Python Testing/Records Parser/Cisco Glassdoor Comments Python Testing.txt', 'r') as f:
+    input_text = f.read()
+
+# split the input text into separate records
+records = re.split(r'From:.*\n', input_text)[1:]
+
+# open the output file
+with open('C:/Users/micha/OneDrive/OneDrive Documents/Python Testing/Records Parser/output pros cons advice Only.txt', 'w') as f:
+    # loop over each record and extract the relevant information
+    for record in records:
+
+
+        # extract the pros, cons, and advice to management
+        pros = re.search(r'Pros\n(.*?)\n\n', record, re.DOTALL)
+        if pros:
+            pros = pros.group(1)
+        else:
+            pros = None
+
+        cons = re.search(r'Cons\n(.*?)\n\n', record, re.DOTALL)
+        if cons:
+            cons = cons.group(1)
+        else:
+            cons = None
+
+        advice = re.search(r'Advice to Senior Management\n(.*?)\n\n', record, re.DOTALL)
+        if advice:
+            advice = advice.group(1)
+        else:
+            advice = None
+
+        # write the extracted information to the output file
+        f.write('Pros: {}\n'.format(pros))
+        f.write('Cons: {}\n'.format(cons))
+        f.write('Advice to Management: {}\n'.format(advice))
+        f.write('\n')

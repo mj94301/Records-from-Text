@@ -1,0 +1,47 @@
+# this script captures header information (everything except pros and cons)
+
+import re
+
+# Define the regular expression patterns
+from_pattern = re.compile(r"From:.*")
+date_pattern = re.compile(r"Posted At:\s*(.*)")
+title_pattern = re.compile(r"Conversation:\s*(.*)")
+employee_pattern = re.compile(r"From\s(.+)\s—\sRating\s(.+)\sout\sof")
+pros_pattern = re.compile(r"Pros\n(.*?)\n\n")
+cons_pattern = re.compile(r"Cons\n(.*?)\n\n")
+
+# Open the input and output files
+with open("C:/Users/micha/OneDrive/OneDrive Documents/Python Testing/Records Parser/Cisco Glassdoor Comments Python Testing.txt") as infile, open("C:/Users/micha/OneDrive/OneDrive Documents/Python Testing/Records Parser/output-NoProsCons.txt", "w") as outfile:
+
+    records = []  # To store all the records
+
+    # Parse the input file and create separate records
+    for line in infile:
+        if from_pattern.match(line):
+            records.append({"from": line.strip(), "date": None, "title": None, "employee": None, "pros": None, "cons": None})
+        elif records:
+            if not records[-1]["date"]:
+                match = date_pattern.match(line)
+                if match:
+                    records[-1]["date"] = match.group(1)
+            elif not records[-1]["title"]:
+                match = title_pattern.match(line)
+                if match:
+                    records[-1]["title"] = match.group(1)
+            elif not records[-1]["employee"]:
+                match = employee_pattern.match(line)
+                if match:
+                    records[-1]["employee"] = {"name": match.group(1), "rating": match.group(2)}
+            elif not records[-1]["pros"]:
+                match = pros_pattern.match(line)
+                if match:
+                    records[-1]["pros"] = match.group(1)
+
+    # Write the output of all records to a file
+    for record in records:
+        outfile.write(f"From: {record['from']}\n")
+        outfile.write(f"Date: {record['date']}\n")
+        outfile.write(f"Title: {record['title']}\n")
+        # outfile.write(f"Employee: {record['employee']['name']} ({record['employee']['rating']})\n")
+        outfile.write(f"Pros: {record['pros']}\n")
+        outfile.write(f"Cons: {record['cons']}\n\n")
